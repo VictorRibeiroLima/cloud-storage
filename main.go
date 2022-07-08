@@ -35,6 +35,7 @@ func setRoutes(router *gin.Engine) {
 		userRoute := v1.Group("/user")
 		{
 			userRoute.GET("/", user.GetUsers)
+			userRoute.GET("/:id", user.GetUser)
 			userRoute.POST("/", user.CreateUser)
 		}
 	}
