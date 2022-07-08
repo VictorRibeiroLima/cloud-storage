@@ -5,11 +5,17 @@ import (
 
 	"github.com/VictorRibeiroLima/cloud-storage/database"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type User struct {
-	gorm.Model
+	database.Model
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"-"`
+}
+
+type UserDto struct {
+	database.Model
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -24,10 +30,11 @@ func GetUsers(context *gin.Context) {
 
 func CreateUser(context *gin.Context) {
 	db := database.DbConnection
-	var user User
-	if err := context.ShouldBindJSON(&user); err != nil {
+	var dto UserDto
+	if err := context.ShouldBindJSON(&dto); err != nil {
 		context.JSON(http.StatusBadRequest, err.Error())
 	}
+	user := (User)(dto)
 	db.Create(&user)
 
 	context.JSON(http.StatusCreated, user)

@@ -2,10 +2,18 @@ package database
 
 import (
 	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+type Model struct {
+	ID        uint           `json:"id"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `json:"deletedAt" gorm:"index"`
+}
 
 var DbConnection *gorm.DB
 
