@@ -1,4 +1,4 @@
-package userapi
+package userController
 
 import (
 	"net/http"
