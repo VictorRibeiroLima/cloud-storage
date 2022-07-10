@@ -1,30 +1,24 @@
-package user
+package userapi
 
 import (
 	"net/http"
 	"strconv"
 
 	"github.com/VictorRibeiroLima/cloud-storage/database"
+	usermodel "github.com/VictorRibeiroLima/cloud-storage/user/model"
 	"github.com/gin-gonic/gin"
 )
 
-type User struct {
-	database.Model
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"-"`
-}
-
 type UserDto struct {
 	database.Model
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password"  binding:"required"`
 }
 
 func GetUsers(context *gin.Context) {
 	db := database.DbConnection
-	var users []User
+	var users []usermodel.User
 	db.Find(&users)
 	context.JSON(http.StatusOK, users)
 }
@@ -38,7 +32,7 @@ func GetUser(context *gin.Context) {
 		})
 		return
 	}
-	var user User
+	var user usermodel.User
 	result := db.First(&user, id)
 	if result.RowsAffected < 1 {
 		context.JSON(http.StatusNotFound, gin.H{
@@ -55,9 +49,16 @@ func CreateUser(context *gin.Context) {
 	var dto UserDto
 	if err := context.ShouldBindJSON(&dto); err != nil {
 		context.JSON(http.StatusBadRequest, err.Error())
+		return
 	}
-	user := (User)(dto)
-	db.Create(&user)
+	user := (usermodel.User)(dto)
+	result := db.Create(&user)
+	if result.Error != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"message": "INTERNAL SERVER ERROR",
+		})
+		return
+	}
 
 	context.JSON(http.StatusCreated, user)
 }

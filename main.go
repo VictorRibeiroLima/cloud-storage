@@ -1,7 +1,8 @@
 package main
 
 import (
-	user "github.com/VictorRibeiroLima/cloud-storage/user"
+	userapi "github.com/VictorRibeiroLima/cloud-storage/user/api"
+	usermodel "github.com/VictorRibeiroLima/cloud-storage/user/model"
 
 	d "github.com/VictorRibeiroLima/cloud-storage/database"
 
@@ -25,7 +26,7 @@ func main() {
 
 func setupDb() {
 	d.InitDb()
-	d.DbConnection.AutoMigrate(&user.User{})
+	d.DbConnection.AutoMigrate(&usermodel.User{})
 	println("Database migrated")
 }
 
@@ -34,9 +35,9 @@ func setRoutes(router *gin.Engine) {
 	{
 		userRoute := v1.Group("/user")
 		{
-			userRoute.GET("/", user.GetUsers)
-			userRoute.GET("/:id", user.GetUser)
-			userRoute.POST("/", user.CreateUser)
+			userRoute.GET("/", userapi.GetUsers)
+			userRoute.GET("/:id", userapi.GetUser)
+			userRoute.POST("/", userapi.CreateUser)
 		}
 	}
 }
