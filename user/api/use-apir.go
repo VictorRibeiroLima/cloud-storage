@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/VictorRibeiroLima/cloud-storage/database"
+	responsebuilder "github.com/VictorRibeiroLima/cloud-storage/response-builder"
 	usermodel "github.com/VictorRibeiroLima/cloud-storage/user/model"
 	"github.com/gin-gonic/gin"
 )
@@ -12,7 +13,7 @@ import (
 type UserDto struct {
 	database.Model
 	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required"`
+	Email    string `json:"email" binding:"required,unique=users"`
 	Password string `json:"password"  binding:"required"`
 }
 
@@ -48,7 +49,7 @@ func CreateUser(context *gin.Context) {
 	db := database.DbConnection
 	var dto UserDto
 	if err := context.ShouldBindJSON(&dto); err != nil {
-		context.JSON(http.StatusBadRequest, err.Error())
+		responsebuilder.BadRequest(context, err)
 		return
 	}
 	user := (usermodel.User)(dto)

@@ -3,6 +3,7 @@ package main
 import (
 	userapi "github.com/VictorRibeiroLima/cloud-storage/user/api"
 	usermodel "github.com/VictorRibeiroLima/cloud-storage/user/model"
+	validator "github.com/VictorRibeiroLima/cloud-storage/validator"
 
 	d "github.com/VictorRibeiroLima/cloud-storage/database"
 
@@ -16,6 +17,8 @@ func main() {
 	}
 
 	setupDb()
+
+	validator.BindValidators()
 
 	router := gin.Default()
 
