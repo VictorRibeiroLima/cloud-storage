@@ -2,7 +2,6 @@ package userController
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/VictorRibeiroLima/cloud-storage/database"
 	models "github.com/VictorRibeiroLima/cloud-storage/model"
@@ -26,19 +25,11 @@ func GetUsers(context *gin.Context) {
 
 func GetUser(context *gin.Context) {
 	db := database.DbConnection
-	id, err := strconv.Atoi(context.Param("id"))
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"message": "id value must be an int",
-		})
-		return
-	}
+	id := context.Param("id")
 	var user models.User
 	result := db.First(&user, id)
 	if result.RowsAffected < 1 {
-		context.JSON(http.StatusNotFound, gin.H{
-			"message": "user not found",
-		})
+		responsebuilder.NotFound(context, "user")
 		return
 	}
 	context.JSON(http.StatusOK, user)
@@ -55,9 +46,7 @@ func CreateUser(context *gin.Context) {
 	user := (models.User)(dto)
 	result := db.Create(&user)
 	if result.Error != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{
-			"message": "INTERNAL SERVER ERROR",
-		})
+		responsebuilder.InternalServerError(context)
 		return
 	}
 

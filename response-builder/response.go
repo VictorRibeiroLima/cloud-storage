@@ -22,3 +22,15 @@ func BadRequest(context *gin.Context, err error) {
 		"errors": apiError,
 	})
 }
+
+func NotFound(context *gin.Context, m string) {
+	context.JSON(http.StatusNotFound, gin.H{
+		"error": m + " not found",
+	})
+}
+
+func InternalServerError(context *gin.Context) {
+	context.JSON(http.StatusNotFound, gin.H{
+		"error": "INTERNAL SERVER ERROR",
+	})
+}
