@@ -6,6 +6,7 @@ import (
 	"time"
 
 	models "github.com/VictorRibeiroLima/cloud-storage/model"
+	userService "github.com/VictorRibeiroLima/cloud-storage/service/user"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -35,17 +36,18 @@ func CreateJwt(user models.User) string {
 	return tokenString
 }
 
-func ValidateJwt(jwtString string) (token *JwtClaims, err error) {
-	jwt, _ := jwt.Parse(jwtString, func(token *jwt.Token) (interface{}, error) {
+func ValidateJwt(jwtString string) (user models.User, err error) {
+	jwt, err := jwt.ParseWithClaims(jwtString, &JwtClaims{}, func(token *jwt.Token) (interface{}, error) {
 		jwtKey := os.Getenv("JWT_KEY")
 		return []byte(jwtKey), nil
 	})
 
 	if jwt.Valid {
 		claims, _ := jwt.Claims.(*JwtClaims)
-		return claims, nil
+		user, _ := userService.FindById(claims.Id)
+		return user, nil
 	} else {
-		return nil, errors.New("Invalid token")
+		return models.User{}, errors.New("Invalid token")
 	}
 
 }

@@ -21,3 +21,13 @@ func Login(email string, passwordString string) (user models.User, err error) {
 	}
 	return user, nil
 }
+
+func FindById(id uint) (models.User, error) {
+	db := database.DbConnection
+	var user models.User
+	result := db.First(&user, id)
+	if result.RowsAffected < 1 {
+		return user, errors.New("not found")
+	}
+	return user, nil
+}

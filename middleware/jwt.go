@@ -19,13 +19,14 @@ func CheckJwt(context *gin.Context) {
 		})
 	} else {
 		tokenString := strings.Trim(authHeader[len(BEARER_SCHEMA):], " ")
-		_, err := authService.ValidateJwt(tokenString)
+		user, err := authService.ValidateJwt(tokenString)
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "Invalid/Expired token",
 			})
 			return
 		}
+		context.Set("user", user)
 		context.Next()
 	}
 }
