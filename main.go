@@ -3,6 +3,7 @@ package main
 import (
 	authController "github.com/VictorRibeiroLima/cloud-storage/controller/auth"
 	userController "github.com/VictorRibeiroLima/cloud-storage/controller/user"
+	"github.com/VictorRibeiroLima/cloud-storage/middleware"
 	models "github.com/VictorRibeiroLima/cloud-storage/model"
 	validator "github.com/VictorRibeiroLima/cloud-storage/validator"
 
@@ -40,7 +41,7 @@ func setRoutes(router *gin.Engine) {
 		userRoute := v1.Group("/user")
 		{
 			userRoute.GET("/", userController.GetUsers)
-			userRoute.GET("/:id", userController.GetUser)
+			userRoute.GET("/:id", middleware.CheckJwt, userController.GetUser)
 			userRoute.POST("/", userController.CreateUser)
 		}
 		authRoute := v1.Group("/auth")

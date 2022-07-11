@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/VictorRibeiroLima/cloud-storage/database"
 	models "github.com/VictorRibeiroLima/cloud-storage/model"
@@ -38,7 +39,7 @@ func Login(context *gin.Context) {
 		Name:  user.Name,
 		Id:    user.ID,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: 15000,
+			ExpiresAt: time.Now().Add(time.Minute * 30).Unix(),
 		},
 	}
 
