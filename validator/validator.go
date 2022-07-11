@@ -11,9 +11,8 @@ var unique validator.Func = func(fl validator.FieldLevel) bool {
 	table := fl.Param()
 	field := fl.FieldName()
 	value := fl.Field().String()
-	query := "SELECT count(*) FROM " + table + " WHERE " + field + " = ?"
-	var count int
-	db.Raw(query, value).Scan(&count)
+	var count int64
+	db.Table(table).Where(field+" = ?", value).Count(&count)
 	return count == 0
 }
 
