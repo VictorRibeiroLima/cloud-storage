@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
 
+	authService "github.com/VictorRibeiroLima/cloud-storage/service/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
@@ -19,16 +19,14 @@ func CheckJwt(context *gin.Context) {
 		})
 	} else {
 		tokenString := strings.Trim(authHeader[len(BEARER_SCHEMA):], " ")
-		fmt.Println(tokenString)
-		token, _ := jwt.Parse(tokenString, validateToken)
-
-		if token.Valid {
-			fmt.Println("You look nice today")
-		} else {
+		_, err := authService.ValidateJwt(tokenString)
+		if err != nil {
 			context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "Invalid/Expired token",
 			})
+			return
 		}
+		context.Next()
 	}
 }
 
