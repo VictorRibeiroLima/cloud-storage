@@ -1,4 +1,4 @@
-package userModel
+package models
 
 import (
 	"github.com/VictorRibeiroLima/cloud-storage/database"

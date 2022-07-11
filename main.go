@@ -1,8 +1,8 @@
 package main
 
 import (
-	userController "github.com/VictorRibeiroLima/cloud-storage/user/controller"
-	userModel "github.com/VictorRibeiroLima/cloud-storage/user/model"
+	userController "github.com/VictorRibeiroLima/cloud-storage/controller/user"
+	models "github.com/VictorRibeiroLima/cloud-storage/model"
 	validator "github.com/VictorRibeiroLima/cloud-storage/validator"
 
 	d "github.com/VictorRibeiroLima/cloud-storage/database"
@@ -29,7 +29,7 @@ func main() {
 
 func setupDb() {
 	d.InitDb()
-	d.DbConnection.AutoMigrate(&userModel.User{})
+	d.DbConnection.AutoMigrate(&models.User{})
 	println("Database migrated")
 }
 

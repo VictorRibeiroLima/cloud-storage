@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/VictorRibeiroLima/cloud-storage/database"
+	models "github.com/VictorRibeiroLima/cloud-storage/model"
 	responsebuilder "github.com/VictorRibeiroLima/cloud-storage/response-builder"
-	usermodel "github.com/VictorRibeiroLima/cloud-storage/user/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,7 +19,7 @@ type UserDto struct {
 
 func GetUsers(context *gin.Context) {
 	db := database.DbConnection
-	var users []usermodel.User
+	var users []models.User
 	db.Find(&users)
 	context.JSON(http.StatusOK, users)
 }
@@ -33,7 +33,7 @@ func GetUser(context *gin.Context) {
 		})
 		return
 	}
-	var user usermodel.User
+	var user models.User
 	result := db.First(&user, id)
 	if result.RowsAffected < 1 {
 		context.JSON(http.StatusNotFound, gin.H{
@@ -52,7 +52,7 @@ func CreateUser(context *gin.Context) {
 		responsebuilder.BadRequest(context, err)
 		return
 	}
-	user := (usermodel.User)(dto)
+	user := (models.User)(dto)
 	result := db.Create(&user)
 	if result.Error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
