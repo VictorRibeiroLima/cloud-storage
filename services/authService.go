@@ -1,13 +1,13 @@
-package authService
+package services
 
 import (
 	"errors"
 	"os"
 	"time"
 
-	models "github.com/VictorRibeiroLima/cloud-storage/model"
-	userService "github.com/VictorRibeiroLima/cloud-storage/service/user"
+	"github.com/VictorRibeiroLima/cloud-storage/models"
 	"github.com/golang-jwt/jwt"
+	"gorm.io/gorm"
 )
 
 type JwtClaims struct {
@@ -17,7 +17,11 @@ type JwtClaims struct {
 	Id    uint   `json:"id"`
 }
 
-func CreateJwt(user models.User) string {
+type AuthService struct {
+	Db *gorm.DB
+}
+
+func (s *AuthService) CreateJwt(user models.User) string {
 	jwtKey := os.Getenv("JWT_KEY")
 
 	claim := JwtClaims{
@@ -36,7 +40,7 @@ func CreateJwt(user models.User) string {
 	return tokenString
 }
 
-func ValidateJwt(jwtString string) (user models.User, err error) {
+func (s *AuthService) ValidateJwt(jwtString string) (user models.User, err error) {
 	jwt, err := jwt.ParseWithClaims(jwtString, &JwtClaims{}, func(token *jwt.Token) (interface{}, error) {
 		jwtKey := os.Getenv("JWT_KEY")
 		return []byte(jwtKey), nil
@@ -44,7 +48,8 @@ func ValidateJwt(jwtString string) (user models.User, err error) {
 
 	if jwt.Valid {
 		claims, _ := jwt.Claims.(*JwtClaims)
-		user, _ := userService.FindById(claims.Id)
+		var user models.User
+		s.Db.First(&user, claims.Id)
 		return user, nil
 	} else {
 		return models.User{}, errors.New("Invalid token")

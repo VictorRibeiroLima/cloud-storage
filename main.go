@@ -1,17 +1,17 @@
 package main
 
 import (
-	authController "github.com/VictorRibeiroLima/cloud-storage/controller/auth"
-	userController "github.com/VictorRibeiroLima/cloud-storage/controller/user"
-	"github.com/VictorRibeiroLima/cloud-storage/middleware"
-	models "github.com/VictorRibeiroLima/cloud-storage/model"
-	validator "github.com/VictorRibeiroLima/cloud-storage/validator"
-
-	d "github.com/VictorRibeiroLima/cloud-storage/database"
+	"github.com/VictorRibeiroLima/cloud-storage/database"
+	"github.com/VictorRibeiroLima/cloud-storage/models"
+	"github.com/VictorRibeiroLima/cloud-storage/module"
+	"github.com/VictorRibeiroLima/cloud-storage/router"
+	"github.com/VictorRibeiroLima/cloud-storage/validator"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
+var providers *module.Providers
 
 func main() {
 	if err := godotenv.Load(".env"); err != nil {
@@ -19,6 +19,7 @@ func main() {
 	}
 
 	setupDb()
+	providers = module.SetupProviders()
 
 	validator.BindValidators()
 
@@ -30,23 +31,19 @@ func main() {
 }
 
 func setupDb() {
-	d.InitDb()
-	d.DbConnection.AutoMigrate(&models.User{})
+	database.InitDb()
+	database.DbConnection.AutoMigrate(&models.User{})
 	println("Database migrated")
 }
 
-func setRoutes(router *gin.Engine) {
-	v1 := router.Group("/v1")
+func setRoutes(r *gin.Engine) {
+
+	v1 := r.Group("/v1")
 	{
 		userRoute := v1.Group("/user")
-		{
-			userRoute.GET("/", userController.GetUsers)
-			userRoute.GET("/:id", middleware.CheckJwt, userController.GetUser)
-			userRoute.POST("/", userController.CreateUser)
-		}
 		authRoute := v1.Group("/auth")
-		{
-			authRoute.POST("/", authController.Login)
-		}
+
+		router.SetupUserRoutes(userRoute, providers)
+		router.SetupAuthRoutes(authRoute, providers)
 	}
 }

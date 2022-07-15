@@ -1,13 +1,24 @@
-package userController
+package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/VictorRibeiroLima/cloud-storage/database"
-	models "github.com/VictorRibeiroLima/cloud-storage/model"
+	"github.com/VictorRibeiroLima/cloud-storage/models"
 	responsebuilder "github.com/VictorRibeiroLima/cloud-storage/response-builder"
 	"github.com/gin-gonic/gin"
 )
+
+type UserService interface {
+	FindById(uint) (models.User, error)
+	FindAll() ([]models.User, error)
+	Create(*models.User) error
+}
+
+type UserController struct {
+	Service UserService
+}
 
 type UserDto struct {
 	database.Model
@@ -16,19 +27,15 @@ type UserDto struct {
 	Password string `json:"password"  binding:"required"`
 }
 
-func GetUsers(context *gin.Context) {
-	db := database.DbConnection
-	var users []models.User
-	db.Find(&users)
+func (c *UserController) GetUsers(context *gin.Context) {
+	users, _ := c.Service.FindAll()
 	context.JSON(http.StatusOK, users)
 }
 
-func GetUser(context *gin.Context) {
-	db := database.DbConnection
-	id := context.Param("id")
-	var user models.User
-	result := db.First(&user, id)
-	if result.RowsAffected < 1 {
+func (c *UserController) GetUser(context *gin.Context) {
+	id, _ := strconv.Atoi(context.Param("id"))
+	user, err := c.Service.FindById(uint(id))
+	if err != nil {
 		responsebuilder.NotFound(context, "user")
 		return
 	}
@@ -36,16 +43,15 @@ func GetUser(context *gin.Context) {
 
 }
 
-func CreateUser(context *gin.Context) {
-	db := database.DbConnection
+func (c *UserController) CreateUser(context *gin.Context) {
 	var dto UserDto
 	if err := context.ShouldBindJSON(&dto); err != nil {
 		responsebuilder.BadRequest(context, err)
 		return
 	}
 	user := (models.User)(dto)
-	result := db.Create(&user)
-	if result.Error != nil {
+
+	if err := c.Service.Create(&user); err != nil {
 		responsebuilder.InternalServerError(context)
 		return
 	}

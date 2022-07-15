@@ -5,12 +5,20 @@ import (
 	"os"
 	"strings"
 
-	authService "github.com/VictorRibeiroLima/cloud-storage/service/auth"
+	"github.com/VictorRibeiroLima/cloud-storage/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
-func CheckJwt(context *gin.Context) {
+type JwtValidator interface {
+	ValidateJwt(jwtString string) (user models.User, err error)
+}
+
+type JwtMiddleware struct {
+	Validator JwtValidator
+}
+
+func (m *JwtMiddleware) CheckJwt(context *gin.Context) {
 	const BEARER_SCHEMA = "Bearer"
 	authHeader := context.GetHeader("Authorization")
 	if authHeader == "" {
@@ -19,7 +27,7 @@ func CheckJwt(context *gin.Context) {
 		})
 	} else {
 		tokenString := strings.Trim(authHeader[len(BEARER_SCHEMA):], " ")
-		user, err := authService.ValidateJwt(tokenString)
+		user, err := m.Validator.ValidateJwt(tokenString)
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "Invalid/Expired token",
