@@ -34,3 +34,29 @@ func (s *StorageService) UploadFile(user models.User, fileHeader *multipart.File
 	}
 	s.Db.Create(&storage)
 }
+
+func (s *StorageService) ListFiles(user models.User) []struct {
+	Id   uint
+	File string
+} {
+	var files []struct {
+		Id   uint
+		File string
+	}
+	rows, _ := s.Db.Model(&models.Storage{}).Where("user_id = ?", user.ID).Rows()
+	defer rows.Close()
+
+	for rows.Next() {
+		var file models.Storage
+
+		s.Db.ScanRows(rows, &file)
+		files = append(files, struct {
+			Id   uint
+			File string
+		}{
+			Id:   file.ID,
+			File: file.FileName + "." + file.FileExtesion,
+		})
+	}
+	return files
+}

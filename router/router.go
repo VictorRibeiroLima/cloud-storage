@@ -8,16 +8,10 @@ import (
 )
 
 func SetupUserRoutes(userRoute *gin.RouterGroup, providers *module.Providers) {
-	jwtMiddleware := middleware.JwtMiddleware{
-		Validator: &providers.AuthService,
-	}
-
 	userController := controllers.UserController{
-		Service: &providers.UserService,
+		UserCreator: &providers.UserService,
 	}
 
-	userRoute.GET("/", userController.GetUsers)
-	userRoute.GET("/:id", jwtMiddleware.CheckJwt, userController.GetUser)
 	userRoute.POST("/", userController.CreateUser)
 
 }
@@ -36,8 +30,10 @@ func SetupStorageRoutes(storageRoute *gin.RouterGroup, providers *module.Provide
 	}
 	storageController := controllers.StorageController{
 		FileUploader: &providers.StorageService,
+		FileLister:   &providers.StorageService,
 	}
 	storageRoute.Use(jwtMiddleware.CheckJwt)
 
 	storageRoute.POST("/", storageController.UploadFile)
+	storageRoute.GET("/", storageController.ListFiles)
 }

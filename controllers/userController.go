@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/VictorRibeiroLima/cloud-storage/models"
 	responsebuilder "github.com/VictorRibeiroLima/cloud-storage/response-builder"
@@ -10,14 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserService interface {
-	FindById(uint) (models.User, error)
-	FindAll() ([]models.User, error)
+type UserCreator interface {
 	Create(*models.User) error
 }
 
 type UserController struct {
-	Service UserService
+	UserCreator UserCreator
 }
 
 type UserDto struct {
@@ -25,22 +22,6 @@ type UserDto struct {
 	Name     string `json:"name" binding:"required"`
 	Email    string `json:"email" binding:"required,unique=users"`
 	Password string `json:"password"  binding:"required"`
-}
-
-func (c *UserController) GetUsers(context *gin.Context) {
-	users, _ := c.Service.FindAll()
-	context.JSON(http.StatusOK, users)
-}
-
-func (c *UserController) GetUser(context *gin.Context) {
-	id, _ := strconv.Atoi(context.Param("id"))
-	user, err := c.Service.FindById(uint(id))
-	if err != nil {
-		responsebuilder.NotFound(context, "user")
-		return
-	}
-	context.JSON(http.StatusOK, user)
-
 }
 
 func (c *UserController) CreateUser(context *gin.Context) {
@@ -51,7 +32,7 @@ func (c *UserController) CreateUser(context *gin.Context) {
 	}
 	user, _ := utils.TypeConverter[models.User](dto)
 
-	if err := c.Service.Create(&user); err != nil {
+	if err := c.UserCreator.Create(&user); err != nil {
 		responsebuilder.InternalServerError(context)
 		return
 	}
