@@ -40,8 +40,10 @@ func setRoutes(r *gin.Engine) {
 	{
 		userRoute := v1.Group("/user")
 		authRoute := v1.Group("/auth")
+		storageRoute := v1.Group("/storage")
 
 		router.SetupUserRoutes(userRoute, providers)
 		router.SetupAuthRoutes(authRoute, providers)
+		router.SetupStorageRoutes(storageRoute, providers)
 	}
 }

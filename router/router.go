@@ -29,3 +29,15 @@ func SetupAuthRoutes(authRoute *gin.RouterGroup, providers *module.Providers) {
 	}
 	authRoute.POST("/", authController.Login)
 }
+
+func SetupStorageRoutes(storageRoute *gin.RouterGroup, providers *module.Providers) {
+	jwtMiddleware := middleware.JwtMiddleware{
+		Validator: &providers.AuthService,
+	}
+	storageController := controllers.StorageController{
+		FileUploader: &providers.StorageService,
+	}
+	storageRoute.Use(jwtMiddleware.CheckJwt)
+
+	storageRoute.POST("/", storageController.UploadFile)
+}
