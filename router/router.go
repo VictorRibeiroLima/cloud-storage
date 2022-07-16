@@ -31,9 +31,11 @@ func SetupStorageRoutes(storageRoute *gin.RouterGroup, providers *module.Provide
 	storageController := controllers.StorageController{
 		FileUploader: &providers.StorageService,
 		FileLister:   &providers.StorageService,
+		FileFinder:   &providers.StorageService,
 	}
 	storageRoute.Use(jwtMiddleware.CheckJwt)
 
 	storageRoute.POST("/", storageController.UploadFile)
 	storageRoute.GET("/", storageController.ListFiles)
+	storageRoute.GET("/download/:id", storageController.Download)
 }

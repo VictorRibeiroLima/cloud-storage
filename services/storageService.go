@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"mime/multipart"
 	"strings"
@@ -59,4 +60,13 @@ func (s *StorageService) ListFiles(user models.User) []struct {
 		})
 	}
 	return files
+}
+
+func (s *StorageService) FindFile(user models.User, id uint) (models.Storage, error) {
+	var file models.Storage
+	result := s.Db.Where("user_id = ? and id = ?", user.ID, id).Find(&file)
+	if result.RowsAffected < 1 {
+		return models.Storage{}, errors.New("Storage not found")
+	}
+	return file, nil
 }
