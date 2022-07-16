@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/VictorRibeiroLima/cloud-storage/database"
 	"github.com/VictorRibeiroLima/cloud-storage/models"
 	responsebuilder "github.com/VictorRibeiroLima/cloud-storage/response-builder"
 	"github.com/VictorRibeiroLima/cloud-storage/utils"
@@ -22,7 +21,7 @@ type UserController struct {
 }
 
 type UserDto struct {
-	database.Model
+	models.Model
 	Name     string `json:"name" binding:"required"`
 	Email    string `json:"email" binding:"required,unique=users"`
 	Password string `json:"password"  binding:"required"`

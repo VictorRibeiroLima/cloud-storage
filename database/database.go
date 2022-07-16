@@ -2,18 +2,11 @@ package database
 
 import (
 	"os"
-	"time"
 
+	"github.com/VictorRibeiroLima/cloud-storage/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-type Model struct {
-	ID        uint           `json:"id" gorm:"not null"`
-	CreatedAt time.Time      `json:"createdAt" gorm:"not null"`
-	UpdatedAt time.Time      `json:"updatedAt" gorm:"not null"`
-	DeletedAt gorm.DeletedAt `json:"deletedAt" gorm:"index"`
-}
 
 var DbConnection *gorm.DB
 
@@ -31,4 +24,9 @@ func InitDb() {
 		panic("Failed to connect to database")
 	}
 	println("Database connected")
+}
+
+func MigrateDb() {
+	DbConnection.AutoMigrate(&models.User{}, &models.Storage{})
+	println("Database migrated")
 }

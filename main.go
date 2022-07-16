@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/VictorRibeiroLima/cloud-storage/database"
-	"github.com/VictorRibeiroLima/cloud-storage/models"
 	"github.com/VictorRibeiroLima/cloud-storage/module"
 	"github.com/VictorRibeiroLima/cloud-storage/router"
 	"github.com/VictorRibeiroLima/cloud-storage/validator"
@@ -32,8 +31,7 @@ func main() {
 
 func setupDb() {
 	database.InitDb()
-	database.DbConnection.AutoMigrate(&models.User{})
-	println("Database migrated")
+	database.MigrateDb()
 }
 
 func setRoutes(r *gin.Engine) {
