@@ -7,6 +7,7 @@ import (
 	"github.com/VictorRibeiroLima/cloud-storage/database"
 	"github.com/VictorRibeiroLima/cloud-storage/models"
 	responsebuilder "github.com/VictorRibeiroLima/cloud-storage/response-builder"
+	"github.com/VictorRibeiroLima/cloud-storage/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -49,7 +50,7 @@ func (c *UserController) CreateUser(context *gin.Context) {
 		responsebuilder.BadRequest(context, err)
 		return
 	}
-	user := (models.User)(dto)
+	user, _ := utils.TypeConverter[models.User](dto)
 
 	if err := c.Service.Create(&user); err != nil {
 		responsebuilder.InternalServerError(context)

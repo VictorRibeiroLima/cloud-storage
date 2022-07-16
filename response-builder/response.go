@@ -18,19 +18,19 @@ func BadRequest(context *gin.Context, err error) {
 		apiError[i] = fe.StructNamespace() + " - failed on validation '" + fe.Tag() + "'"
 
 	}
-	context.JSON(http.StatusBadRequest, gin.H{
+	context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 		"errors": apiError,
 	})
 }
 
 func NotFound(context *gin.Context, m string) {
-	context.JSON(http.StatusNotFound, gin.H{
+	context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 		"error": m + " not found",
 	})
 }
 
 func InternalServerError(context *gin.Context) {
-	context.JSON(http.StatusNotFound, gin.H{
+	context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 		"error": "INTERNAL SERVER ERROR",
 	})
 }
